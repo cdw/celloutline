@@ -115,9 +115,23 @@ class Spiral:
     to declare arbitrary numbers of points in the spiral.
     """
     def __init__(self, num_of_pts):
-        self.n = num_of_pts
-        self.rpt = self.
-        self.xyz = self.
+        self._n = num_of_pts
+        self._xyz, self._rpt = self._fib_sphere(num_of_pts)
+
+    @property
+    def n(self):
+        """Number of points"""
+        return self._n
+
+    @property
+    def xyz(self):
+        """Cartesian coordinates"""
+        return self._xyz
+
+    @property
+    def rpt(self):
+        """Spherical coordinates (radius, elevation, azimuth)"""
+        return self._rpt
 
     @static
     def _fib_sphere(n_samples):
