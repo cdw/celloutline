@@ -115,6 +115,7 @@ class Spiral:
     to declare arbitrary numbers of points in the spiral.
     """
     def __init__(self, num_of_pts):
+        """Create and remember a spiral with a given num_of_pts"""
         self._n = num_of_pts
         self._xyz, self._rpt = self._fib_sphere(num_of_pts)
 
