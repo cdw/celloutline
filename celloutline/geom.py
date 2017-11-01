@@ -35,14 +35,6 @@ def sphere_to_cart(rpt):
     return cart
 
 
-def sprial_to_point_cloud(spiral, rays_rpt, origin):
-    """Convert spiral back to points using a set of rays and an origin"""
-    rpt = np.hstack((np.expand_dims(spiral, -1), rays_rpt[:,1:]))
-    xyz = sphere_to_cart(rpt)
-    xyz += origin
-    return xyz
-
-
 """ Ray intersection: support binary segmentation -> spiral """
 
 @jit
@@ -108,12 +100,12 @@ def nearest_intersecting(ray, voxel_corners):
 
 """ Spiral creation and remembering """
 
-class Spiral:
+class UnitSpiral:
     """Why a class for this? Because we don't want to recalculate the 
     spiral order each time a spiral gets used, but we want to be able 
     to declare arbitrary numbers of points in the spiral.
     """
-    def __init__(self, num_of_pts):
+    def __init__(self, num_of_pts,h):
         """Create and remember a spiral with a given num_of_pts"""
         self._n = num_of_pts
         self._xyz, self._rpt = self._fib_sphere(num_of_pts)
