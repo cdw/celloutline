@@ -125,7 +125,7 @@ class UnitSpiral:
         """Spherical coordinates (radius, elevation, azimuth)"""
         return self._rpt
 
-    @static
+    @staticmethod
     def _fib_sphere(n_samples):
         """Sample n points across the surface of a sphere
         
