@@ -1,7 +1,6 @@
-""" Geometric transforms and supporting concepts
-
-Unit conversion and generation of spirals and maybe more?
-
+# encoding: utf-8
+""" Geometric transforms and supporting concepts: consequences of 3D world
+Author: CDW
 """
 
 # Standard or installed

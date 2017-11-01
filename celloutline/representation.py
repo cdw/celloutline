@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 # encoding: utf-8
-""" Representation converts between and compares cell representations 
+""" Representation stores and compares cell representations 
 Author: CDW
 """
 
