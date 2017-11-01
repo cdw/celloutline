@@ -8,7 +8,7 @@ import numpy as np
 from scipy.spatial import distance
 from numba import jit
 # Local
-import greedy
+from . import greedy
 
 """ Coordinate conversion """
 

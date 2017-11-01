@@ -7,11 +7,11 @@ Author: CDW
 import numpy as np
 import scipy.ndimage
 # Local
-from .geom import sphere_to_cart, sprial_to_point_cloud, Spiral
+from . import conversions  # does heavy lifting of binary->other->back
 
-__all__ = ["BinaryVoxel", "SpreadVoxel", "SpiralizedTrace"]
 
-""" Raw representation conversions, one type of encoding to the next
+__all__ = ["BinaryVoxel", "SpreadVoxel",
+           "SpiralizedTrace", "mesh_error"]
 
 
 
