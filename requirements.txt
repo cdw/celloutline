@@ -1,0 +1,7 @@
+numba
+numpy
+matplotlib
+pandas
+scipy
+sklearn
+trimesh
