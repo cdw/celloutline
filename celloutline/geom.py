@@ -10,7 +10,7 @@ from numba import jit
 # Local
 from . import greedy
 
-""" Coordinate conversion """
+""" Coordinate conversion: xyz to rpt and back """
 
 def cart_to_sphere(xyz): 
     """Take in xyz row vectors and return rpt row vectors
@@ -106,7 +106,7 @@ def nearest_intersecting(ray, voxel_corners):
     return voxels[closest_ind]
 
 
-""" Spiral creation and memorization """
+""" Spiral creation and remembering """
 
 class Spiral:
     """Why a class for this? Because we don't want to recalculate the 

@@ -14,6 +14,7 @@ __all__ = ["BinaryVoxel", "SpreadVoxel",
            "SpiralizedTrace", "mesh_error"]
 
 
+""" Comparisons between the representations; happen at mesh level """
 
 
 
