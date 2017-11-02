@@ -90,7 +90,7 @@ class BinaryVoxel(Representation):
     def mesh(self):
         """The mesh of the voxels"""
         if self._mesh is None:
-            self._mesh = conversions.binary_to_mesh(self.voxels)
+            self._mesh = conversions.binary_to_trimesh(self.voxels)
             assert self._mesh.is_watertight, "leaky mesh"
         return self._mesh
 
@@ -99,7 +99,7 @@ class BinaryVoxel(Representation):
         """A spread representation of the binary voxels"""
         if self._spread is None:
             spread_voxels = conversions.binary_to_spread(self.voxels)
-            self._spread = SpreadVoxels(self.id, 
+            self._spread = SpreadVoxel(self.id, 
                                         self.source, 
                                         spread_voxels)
         return self._spread
@@ -163,11 +163,11 @@ class SpiralizedTrace(Representation):
     @property
     def mesh(self):
         if self._mesh is None:
-            self._mesh = conversions.spiral_to_mesh(**self.spiral_dict)
+            self._mesh = conversions.spiral_to_trimesh(**self.spiral_dict)
         return self._mesh
 
 
-class SpreadVoxels(Representation):
+class SpreadVoxel(Representation):
     """Level set derived from binary voxels"""
     def __init__(self, id, source, spread, cutoff=0.0):
         """
@@ -202,7 +202,7 @@ class SpreadVoxels(Representation):
     def mesh(self):
         """New mesh if not done or if cuttoff has changed"""
         if self._mesh is None or self._cutoff_change:
-            self._mesh = conversions.spread_to_mesh(
+            self._mesh = conversions.spread_to_trimesh(
                 self._spread, self._cutoff)
             self._cutoff_change = False
         return self._mesh

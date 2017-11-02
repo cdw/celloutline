@@ -13,21 +13,22 @@ Author: CDW
 import numpy as np
 import trimesh  #handles mesh creation and interface to OpenSCAD
 from skimage.measure import marching_cubes
+import skimage.segmentation
 import scipy.ndimage
 import scipy.spatial
 # Local
 from . import geom
 
 
-def binary_to_mesh(binary):
+def binary_to_trimesh(binary):
     """ Convert binary voxel image to a mesh
 
     Marching cubes meshed output from
     http://scikit-image.org/docs/dev/api/skimage.measure.html#marching-cubes-lewiner
     """
     verts, faces, _, _ = marching_cubes(binary)
-    tm = trimesh.Trimesh(verts, faces)
-    return Mesh(tm)
+    mesh = trimesh.Trimesh(verts, faces)
+    return mesh
 
 
 def binary_to_spiral(binary, unitspiral=None, num_pts=None):
@@ -58,14 +59,15 @@ def binary_to_spiral(binary, unitspiral=None, num_pts=None):
     if unitspiral is None:
         unitspiral = geom.UnitSpiral(num_pts)
     # Find shell to intersect with
-    shell = segmentation.find_boundaries(binary, connectivity=1, mode='outer')
+    shell = skimage.segmentation.find_boundaries(
+        binary, connectivity=1, mode='outer')
     surf_coords = list(np.array(shell.nonzero()).T)
     origin = np.divide(shell.shape,2).astype(int)
     # Find intersections
     xyz = []
     for ray in unitspiral.xyz:
-        xyz.append(nearest_intersecting((origin, ray), surf_coords))
-    radii = [dist(origin, pt, 0.5) for pt in output_pts]
+        xyz.append(geom.nearest_intersecting((origin, ray), surf_coords))
+    radii = [geom.dist_w_offset(origin, pt, 0.5) for pt in xyz]
     spiral_dict = {'unitspiral':unitspiral, 
                    'radii':radii, 
                    'origin':origin}
@@ -124,7 +126,7 @@ def spiral_to_point_cloud(radii, unitspiral, origin):
     return xyz
 
 
-def spiral_to_mesh(radii, unitspiral, origin):
+def spiral_to_trimesh(radii, unitspiral, origin):
     """Spiral to mesh via a triangulation of the unitspiral's rays"""
     # Convert radii to xyz points
     point_cloud = spiral_to_point_cloud(radii, spiral, origin)

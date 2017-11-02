@@ -5,7 +5,7 @@ Author: CDW
 
 # Standard or installed
 import numpy as np
-from scipy.spatial import distance
+import scipy.spatial
 from numba import jit
 # Local
 from . import greedy
@@ -82,10 +82,10 @@ def _intersect(ray, box):
     return True
 
 
-def _dist(origin, pt, correction=0):
+def dist_w_offset(origin, pt, correction=0):
     """Distance between origin and point with optional correction factor"""
     pt = np.add(pt, correction)
-    distance = distance.euclidean(origin, pt)
+    distance = scipy.spatial.distance.euclidean(origin, pt)
     return distance
 
 
@@ -94,7 +94,7 @@ def nearest_intersecting(ray, voxel_corners):
     Ray is ((xyz origin), (xyz unit direction))
     Voxels are ((xyz),(xyz)...) and assumed 1x1x1"""
     voxels = [v for v in voxel_corners if _intersect(ray,(v,np.add(v,1)))]
-    closest_ind = np.argmin([_dist(ray[0],v,0.5) for v in voxels])
+    closest_ind = np.argmin([dist_w_offset(ray[0],v,0.5) for v in voxels])
     return voxels[closest_ind]
 
 
@@ -105,7 +105,7 @@ class UnitSpiral:
     spiral order each time a spiral gets used, but we want to be able 
     to declare arbitrary numbers of points in the spiral.
     """
-    def __init__(self, num_of_pts,h):
+    def __init__(self, num_of_pts):
         """Create and remember a spiral with a given num_of_pts"""
         self._n = num_of_pts
         self._xyz, self._rpt = self._fib_sphere(num_of_pts)
@@ -138,7 +138,7 @@ class UnitSpiral:
         d_th = np.pi * (3 - np.sqrt(5))
         th = np.mod(th_0 + s*d_th, 2*np.pi)
         # Cylindrical z
-        d_z = 2/n
+        d_z = 2/n_samples
         z_0 = d_z/2
         z = (z_0 + s*d_z) - 1
         # Cylindrical r
@@ -148,8 +148,9 @@ class UnitSpiral:
         y = np.sin(th) * r
         xyz = np.stack((x,y,z), 1)
         # Order points using TSP
-        distmat = distance.squareform(distance.pdist(xyz))
-        first, last = np.argmax(xyz[:,2]), np.argmin(pts_xyz[:,2])
+        distmat = scipy.spatial.distance.squareform(
+            scipy.spatial.distance.pdist(xyz))
+        first, last = np.argmax(xyz[:,2]), np.argmin(xyz[:,2])
         inds_sorted = greedy.solve_tsp(distmat, 10, endpoints=(first,last))
         xyz = xyz[inds_sorted]
         # Spherical
