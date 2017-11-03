@@ -9,5 +9,5 @@ celloutline works with 3D binary segmentations, nominally of stem cells as produ
 Currently not available through pip, install locally for symlinked updates with git pulls via:
 
     git clone https://github.com/AllenCellModeling/celloutline.git
-    pip install -e celloutline
+    pip install -e .
 
