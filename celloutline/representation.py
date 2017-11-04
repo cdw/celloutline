@@ -86,15 +86,13 @@ class BinaryVoxel(Representation):
                 self._voxels = self.source[self.id]
         return self._voxels
 
-    @property
-    def mesh(self):
+    def mesh(self, step=1):
         """The mesh of the voxels"""
         if self._mesh is None:
-            self._mesh = conversions.binary_to_trimesh(self.voxels)
+            self._mesh = conversions.binary_to_trimesh(self.voxels, step)
             assert self._mesh.is_watertight, "leaky mesh"
         return self._mesh
 
-    @property
     def spread(self):
         """A spread representation of the binary voxels"""
         if self._spread is None:

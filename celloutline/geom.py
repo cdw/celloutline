@@ -88,12 +88,12 @@ def dist_w_offset(origin, pt, correction=0):
     distance = scipy.spatial.distance.euclidean(origin, pt)
     return distance
 
-
-def nearest_intersecting(ray, voxel_corners):
+def nearest_intersecting(ray, voxel_boxes):
     """What intersecting voxel is nearest the ray's origin?
     Ray is ((xyz origin), (xyz unit direction))
-    Voxels are ((xyz),(xyz)...) and assumed 1x1x1"""
-    voxels = [v for v in voxel_corners if _intersect(ray,(v,np.add(v,1)))]
+    Voxels are (((xyz), (x+1, y+1, z+1)), ...) 
+    """
+    voxels = [v[0] for v in voxel_boxes if _intersect(ray,v)]
     closest_ind = np.argmin([dist_w_offset(ray[0],v,0.5) for v in voxels])
     return voxels[closest_ind]
 
