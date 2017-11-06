@@ -1,11 +1,10 @@
 # encoding: utf-8
-""" Representation stores and compares cell representations 
+""" Representation stores and compares cell representations
 Author: CDW
 """
 
 # Standard or installed
 import numpy as np
-import scipy.ndimage
 # Local
 from . import conversions  # does heavy lifting of binary->other->back
 
@@ -21,33 +20,33 @@ def mesh_error(mesh1, mesh2):
     """Error (intersection over union) of the two meshes"""
     intersection = mesh1.intersection(mesh2)
     union = mesh1.union(mesh2)
-    mesh_error = intersection.volume/union.volume
-    return mesh_error
+    error = intersection.volume/union.volume
+    return error
 
 
 """ Representational classes """
- 
+
 
 class Representation:
     """What all the forms of a segmentation are based on"""
-    def __init__(self, id, source=None):
+    def __init__(self, name, source=None):
         """Remember where we came from
-        
+
         Parameters
         ----------
-        id: string
+        name: string
             key or filename
         source: collection or None
-            dict or other collection for key, None if the id 
+            dict or other collection for key, None if the id
             is a filename
         """
-        self.id = id
+        self.name = name
         self.source = source
         self._voxels = None
         self._spread = None
         self._spiral = None
         self._mesh = None
-    
+
     def error(self, other):
         """Mismatch between this and another representation"""
         return mesh_error(self.mesh, other.mesh)
@@ -55,35 +54,35 @@ class Representation:
 
 class BinaryVoxel(Representation):
     """Reading and conversion of binary cell segmentations"""
-    def __init__(self, id, source=None, voxels=None):
+    def __init__(self, name, source=None, voxels=None):
         """This is the native representation of 3D microscopy data
 
-        We read in the binary voxel representation from numpy arrays 
-        that have been created from the original microscopy data by 
+        We read in the binary voxel representation from numpy arrays
+        that have been created from the original microscopy data by
         alignment and downsampling to uniform square voxels.
 
         Parameters
         ----------
-        id: string
+        name: string
             key or filename
         source: collection or None
-            dict or other collection for key, None if the id 
+            dict or other collection for key, None if the name
             is a filename
         voxels: i-by-j-by-k array or None
             the voxels of interest or nothing (in which case we load
             them on request)
         """
-        super().__init__(id, source)
-        self._voxels = voxels # lazy load initial data
+        super().__init__(name, source)
+        self._voxels = voxels  # lazy load initial data
 
     @property
     def voxels(self):
         """The binary voxel representation of the cell"""
         if self._voxels is None:
-            if self.source is None: # load from disc
-                self._voxels = np.load(self.id)['cell']
-            else: # load from source collection
-                self._voxels = self.source[self.id]
+            if self.source is None:  # load from disc
+                self._voxels = np.load(self.name)['cell']
+            else:  # load from source collection
+                self._voxels = self.source[self.name]
         return self._voxels
 
     def mesh(self, step=1):
@@ -97,9 +96,9 @@ class BinaryVoxel(Representation):
         """A spread representation of the binary voxels"""
         if self._spread is None:
             spread_voxels = conversions.binary_to_spread(self.voxels)
-            self._spread = SpreadVoxel(self.id, 
-                                        self.source, 
-                                        spread_voxels)
+            self._spread = SpreadVoxel(self.name,
+                                       self.source,
+                                       spread_voxels)
         return self._spread
 
     def spiral(self, unitspiral=None, num_pts=500):
@@ -108,32 +107,32 @@ class BinaryVoxel(Representation):
             spidict = conversions.binary_to_spiral(
                 self.voxels, unitspiral, num_pts)
             self._spiral = SpiralizedTrace(
-                self.id, self.source, **spidict)
+                self.name, self.source, **spidict)
         return self._spiral
-        
+
 
 class SpiralizedTrace(Representation):
     """Spiral trace along the cell surface"""
-    def __init__(self, id, source, radii, unitspiral, origin):
-        """ Contain a representation of a spiralized trace and 
-        the unit spiral that is needed to generate it. 
-        
+    def __init__(self, name, source, radii, unitspiral, origin):
+        """ Contain a representation of a spiralized trace and
+        the unit spiral that is needed to generate it.
+
         Parameters
         ----------
-        id: string
+        name: string
             key or filename
         source: collection or None
-            dict or other collection for key, None if the id 
+            dict or other collection for key, None if the name
             is a filename
         radii: 1-by-n array
-            list of distances from the origin to the first shell 
+            list of distances from the origin to the first shell
             intersection for a given spiral
         unitspiral: UnitSpiral object
             contains unit rays (in same order as radii) with angles
         origin: 3-by-1 array
             xyz offset of the center of the segmentation
         """
-        super().__init__(id, source)
+        super().__init__(name, source)
         self._point_cloud = None
         self.spiral_dict = {'unitspiral': unitspiral,
                             'radii': radii,
@@ -167,22 +166,22 @@ class SpiralizedTrace(Representation):
 
 class SpreadVoxel(Representation):
     """Level set derived from binary voxels"""
-    def __init__(self, id, source, spread, cutoff=0.0):
+    def __init__(self, name, source, spread, cutoff=0.0):
         """
         Parameters
         ----------
-        id: string
+        name: string
             key or filename
         source: collection or None
-            dict or other collection for key, None if the id 
+            dict or other collection for key, None if the name
             is a filename
         spread: i-by-j-by-k array
-            the spread voxels of interest 
+            the spread voxels of interest
         cutoff: float
             where we set the isosurface for the mesh conversion
         """
-        super().__init__(id, source)
-        self._spread = spread 
+        super().__init__(name, source)
+        self._spread = spread
         self._cutoff = cutoff
         self._cutoff_change = False
 
