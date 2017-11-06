@@ -11,7 +11,7 @@ Author: CDW
 
 # Standard or installed
 import numpy as np
-import trimesh  #handles mesh creation and interface to OpenSCAD
+import trimesh  # handles mesh creation and interface to OpenSCAD
 import skimage.measure
 import skimage.segmentation
 import scipy.ndimage
@@ -31,7 +31,7 @@ def binary_to_trimesh(binary, step=1):
     binary: i-by-j-by-k array
         array to mesh, assumed to be binary segmentation
     step: int (default 1)
-        number of voxels to step over when generating mesh, larger is courser 
+        number of voxels to step over when generating mesh, larger is courser
     """
     verts, faces, _, _ = skimage.measure.marching_cubes(binary, step_size=step)
     mesh = trimesh.Trimesh(verts, faces)
@@ -69,22 +69,22 @@ def binary_to_spiral(binary, unitspiral=None, num_pts=None):
     shell = skimage.segmentation.find_boundaries(
         binary, connectivity=1, mode='outer')
     surf_coords = list(np.array(shell.nonzero()).T)
-    surf_voxel_boxes = [(v, np.add(1,v)) for v in surf_coords]
-    origin = np.divide(shell.shape,2).astype(int)
+    surf_voxel_boxes = [(v, np.add(1, v)) for v in surf_coords]
+    origin = np.divide(shell.shape, 2).astype(int)
     # Find intersections
     xyz = []
     for ray in unitspiral.xyz:
         xyz.append(geom.nearest_intersecting((origin, ray), surf_voxel_boxes))
     radii = [geom.dist_w_offset(origin, pt, 0.5) for pt in xyz]
-    spiral_dict = {'unitspiral':unitspiral, 
-                   'radii':radii, 
-                   'origin':origin}
+    spiral_dict = {'unitspiral': unitspiral,
+                   'radii': radii,
+                   'origin': origin}
     return spiral_dict
 
 
 def binary_to_spread(binary):
     """Convert a binary voxel image into a levelset
-    
+
     The resulting mapping positive inside cell and negative outside
 
     Parameters
@@ -95,8 +95,8 @@ def binary_to_spread(binary):
     Returns
     -------
     spread: i-by-j-by-k array
-        a distance mapping where each voxel contains the Euclidean 
-        distance to the shell of the segmentation, with a positive sign 
+        a distance mapping where each voxel contains the Euclidean
+        distance to the shell of the segmentation, with a positive sign
         inside the shell and a negative sign outside the shell
     """
     # The interior is dist to shell
@@ -110,11 +110,11 @@ def binary_to_spread(binary):
 
 def spiral_to_point_cloud(radii, unitspiral, origin):
     """Convert a spiral trace back to a xyz point cloud
-    
+
     Parameters
     ----------
     radii: 1-by-n array
-        list of distances from the origin to the first shell 
+        list of distances from the origin to the first shell
         intersection for a given spiral
     unitspiral: UnitSpiral object
         contains unit rays (in same order as radii) with angles
@@ -127,7 +127,7 @@ def spiral_to_point_cloud(radii, unitspiral, origin):
         locations of each point for which we had a radius
     """
     # Like the original unitspiral, but with new radii
-    rpt = np.hstack((np.expand_dims(radii, -1), unitspiral.rpt[:,1:]))
+    rpt = np.hstack((np.expand_dims(radii, -1), unitspiral.rpt[:, 1:]))
     # Convert the whole thing to cartesian and offset by the origin
     xyz = geom.sphere_to_cart(rpt)
     xyz += origin
@@ -149,10 +149,9 @@ def spiral_to_trimesh(radii, unitspiral, origin):
 
 def spread_to_binary(spread, cutoff):
     """Convert levelset to binary via inequality"""
-    return spread>cutoff
+    return spread > cutoff
 
 
 def spread_to_trimesh(spread, cutoff):
     """Convert levelset to mesh by way of binary"""
     return binary_to_trimesh(spread_to_binary(spread, cutoff))
-
