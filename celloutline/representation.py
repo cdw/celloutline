@@ -9,8 +9,8 @@ import numpy as np
 from . import conversions  # does heavy lifting of binary->other->back
 
 
-__all__ = ["BinaryVoxel", "SpreadVoxel",
-           "SpiralizedTrace", "mesh_error"]
+__all__ = ("BinaryVoxel", "SpreadVoxel",
+           "SpiralizedTrace", "mesh_error")
 
 
 """ Comparisons between the representations; happen at mesh level """
@@ -37,7 +37,7 @@ class Representation:
         name: string
             key or filename
         source: collection or None
-            dict or other collection for key, None if the id
+            dict or other collection for key, None if the name
             is a filename
         """
         self.name = name
@@ -103,7 +103,7 @@ class BinaryVoxel(Representation):
 
     def spiral(self, unitspiral=None, num_pts=500):
         """A spiral representation of the cell"""
-        if self._spiral is None:
+        if self._spiral is None or unitspiral is not None:
             spidict = conversions.binary_to_spiral(
                 self.voxels, unitspiral, num_pts)
             self._spiral = SpiralizedTrace(
