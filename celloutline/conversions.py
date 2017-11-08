@@ -35,6 +35,7 @@ def binary_to_trimesh(binary, step=1):
     """
     verts, faces, _, _ = skimage.measure.marching_cubes(binary, step_size=step)
     mesh = trimesh.Trimesh(verts, faces)
+    mesh.fix_normals()
     return mesh
 
 
