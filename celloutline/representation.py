@@ -110,6 +110,17 @@ class BinaryVoxel(Representation):
                 self.name, self.source, **spidict)
         return self._spiral
 
+    def to_vector(self):
+        """Row vector representation for use with models"""
+        return self.voxels.flatten()
+
+    def from_vector(self, vector):
+        """Reshape in an input vector back to a voxel array.
+        Return a new BinaryVoxel instance for the new data
+        """
+        newvox = vector.reshape(self.voxels.shape)
+        return BinaryVoxel(self.name, 'reconstruction', newvox)
+
 
 class SpiralizedTrace(Representation):
     """Spiral trace along the cell surface"""
@@ -163,6 +174,18 @@ class SpiralizedTrace(Representation):
             self._mesh = conversions.spiral_to_trimesh(**self.spiral_dict)
         return self._mesh
 
+    def to_vector(self):
+        """Row vector representation for use with models"""
+        return self.radii
+
+    def from_vector(self, vector):
+        """Reshape in an input vector back to a voxel array.
+        Return a new SpiralizedTrace instance for the new data
+        """
+        new_spiral_dict = self.spiral_dict.copy()
+        new_spiral_dict['radii'] = vector
+        return SpiralizedTrace(self.name, 'reconstruction', **new_spiral_dict)
+
 
 class SpreadVoxel(Representation):
     """Level set derived from binary voxels"""
@@ -203,3 +226,14 @@ class SpreadVoxel(Representation):
                 self._spread, self._cutoff)
             self._cutoff_change = False
         return self._mesh
+
+    def to_vector(self):
+        """Row vector representation for use with models"""
+        return self._spread.flatten()
+
+    def from_vector(self, vector):
+        """Reshape in an input vector back to a voxel array.
+        Return a new BinaryVoxel instance for the new data
+        """
+        newspread = vector.reshape(self._spread.shape)
+        return BinaryVoxel(self.name, 'reconstruction', newspread)
