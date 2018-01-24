@@ -11,3 +11,9 @@ Currently not available through pip, install locally for symlinked updates with 
     git clone https://github.com/AllenCellModeling/celloutline.git
     pip install -e .
 
+## Using docker
+
+Docker file can be built and run with make
+
+	make build
+	make run
