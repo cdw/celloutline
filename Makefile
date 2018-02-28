@@ -23,6 +23,9 @@ export $(shell sed 's/=.*//' $(cnf))
 build: ## Build the container
 	docker build -t $(APP_NAME) .
 
+build_dl: ## Build the dl container, hosted remotely
+	docker build -t $(DL_APP_NAME) $(DL_REMOTE_REPO)
+
 build-nc: ## Build the container without caching
 	docker build --no-cache -t $(APP_NAME) .
 
@@ -30,6 +33,9 @@ run: ## Run container
 	# Default to port configured in `config.env`
 	# Override with `make run PORT=????` 
 	docker run -i -t --rm --env-file=./config.env -p=$(PORT):8888 -v $(LOCAL_MOUNT):/home/$(USER)/nfs --ipc=host $(APP_NAME)
+
+run_dl: ## Run container 
+	docker run -i -t --rm --env-file=./config.env -p=$(PORT):8888 -v $(LOCAL_MOUNT):/home/$(DL_USER)/nfs --ipc=host $(DL_APP_NAME)
 
 up: build run ## Run container on port configured in `config.env` (Alias to run)
 
