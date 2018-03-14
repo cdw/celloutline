@@ -6,7 +6,7 @@ Author: CDW
 # Standard or installed
 import numpy as np
 # Local
-from . import conversions  # does heavy lifting of binary->other->back
+from . import conversion  # does heavy lifting of binary->other->back
 
 
 __all__ = ("BinaryVoxel", "SpreadVoxel",
@@ -88,14 +88,14 @@ class BinaryVoxel(Representation):
     def mesh(self, step=1):
         """The mesh of the voxels"""
         if self._mesh is None:
-            self._mesh = conversions.binary_to_trimesh(self.voxels, step)
+            self._mesh = conversion.binary_to_trimesh(self.voxels, step)
             assert self._mesh.is_watertight, "leaky mesh"
         return self._mesh
 
     def spread(self):
         """A spread representation of the binary voxels"""
         if self._spread is None:
-            spread_voxels = conversions.binary_to_spread(self.voxels)
+            spread_voxels = conversion.binary_to_spread(self.voxels)
             self._spread = SpreadVoxel(self.name,
                                        self.source,
                                        spread_voxels)
@@ -104,7 +104,7 @@ class BinaryVoxel(Representation):
     def spiral(self, unitspiral=None, num_pts=500):
         """A spiral representation of the cell"""
         if self._spiral is None or unitspiral is not None:
-            spidict = conversions.binary_to_spiral(
+            spidict = conversion.binary_to_spiral(
                 self.voxels, unitspiral, num_pts)
             self._spiral = SpiralizedTrace(
                 self.name, self.source, **spidict)
@@ -164,14 +164,14 @@ class SpiralizedTrace(Representation):
     @property
     def point_cloud(self):
         if self._point_cloud is None:
-            self._point_cloud = conversions.spiral_to_point_cloud(
+            self._point_cloud = conversion.spiral_to_point_cloud(
                 **self.spiral_dict)
         return self._point_cloud
 
     @property
     def mesh(self):
         if self._mesh is None:
-            self._mesh = conversions.spiral_to_trimesh(**self.spiral_dict)
+            self._mesh = conversion.spiral_to_trimesh(**self.spiral_dict)
         return self._mesh
 
     def to_vector(self):
@@ -222,7 +222,7 @@ class SpreadVoxel(Representation):
     def mesh(self):
         """New mesh if not done or if cuttoff has changed"""
         if self._mesh is None or self._cutoff_change:
-            self._mesh = conversions.spread_to_trimesh(
+            self._mesh = conversion.spread_to_trimesh(
                 self._spread, self._cutoff)
             self._cutoff_change = False
         return self._mesh

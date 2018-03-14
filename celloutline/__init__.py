@@ -1,5 +1,5 @@
-from .version import __version__  # noqa
-from . import representation # noqa
-from . import conversions # noqa
-from . import model # noqa
-from .celloutline import *  # noqa
+from .version import __version__
+from . import conversion
+from . import representation
+
+__all__ = ('UnitSpiral')
