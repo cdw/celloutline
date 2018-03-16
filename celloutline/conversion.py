@@ -225,8 +225,8 @@ def trimesh_to_binary(mesh, shape):
     # Where to sample
     z_locs = np.arange(shape[2])+.5 
     # Take sections
-    sections = [take_2d_slice(mesh, z) for z in z_locs]
+    sections = [_take_2d_slice(mesh, z) for z in z_locs]
     # Convert to a binary z-stack 
-    z_stack = [draw_Path2D(path, shape[:2]) for path in sections]
+    z_stack = [_draw_Path2D(path, shape[:2]) for path in sections]
     z_stack = np.swapaxes(np.dstack(z_stack), 0, 1)
     return z_stack
